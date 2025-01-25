@@ -35,14 +35,13 @@ class _Degree01State extends State<Degree01> {
 
   // Finding number of years
   void findMax() {
-    for(final value in dataValues) {
+    for (final value in dataValues) {
       int baseNo = int.parse(value['year_sem'].toString().split('_')[0]);
-      while(baseNo > yearNo) {
+      while (baseNo > yearNo) {
         addNewWidget(++yearNo);
       }
     }
   }
-
 
   @override
   void initState() {
@@ -58,12 +57,10 @@ class _Degree01State extends State<Degree01> {
       setState(() {
         dataValues = result;
       });
-    }
-    );
-
+    });
 
     await SQLHelper.getScale().then((List result) {
-      for(final scale in result) {
+      for (final scale in result) {
         scaleMap[scale['grade']] = scale['scale'];
       }
     });
@@ -71,45 +68,46 @@ class _Degree01State extends State<Degree01> {
     findMax();
   }
 
-
-
   // Calculating total GPA ...
   double gpaCalculate() {
     double totalGpa = 0;
     double totalCredits = 0;
 
-    if(stateInit) {
+    if (stateInit) {
       for (final values in dataValues) {
         totalCredits += values['credits'];
         totalGpa += values['credits'] * scaleMap[values['grade']];
       }
     }
     setState(() {
-      gpaCalculated = (totalCredits != 0) ? (totalGpa / totalCredits): 0.0;
+      gpaCalculated = (totalCredits != 0) ? (totalGpa / totalCredits) : 0.0;
     });
-    return (totalCredits != 0) ? (totalGpa / totalCredits): 0.0;
+    return (totalCredits != 0) ? (totalGpa / totalCredits) : 0.0;
   }
 
-  Future<bool> calculateYearGpa(int year) async{
+  Future<bool> calculateYearGpa(int year) async {
     var result = await SQLHelper.getResultYear(year);
     List<List<double>> tempList = [];
-    for(int i = 1; i <= 2; i++) {
+    for (int i = 1; i <= 2; i++) {
       double totalGpa = 0;
       double totalCredits = 0;
-      for(final value in result) {
-        if(value['year_sem'] == "${year}_$i") {
+      for (final value in result) {
+        if (value['year_sem'] == "${year}_$i") {
           totalGpa += value['credits'] * scaleMap['${value["grade"]}'];
           totalCredits += value['credits'];
         }
       }
-      tempList.add([(totalGpa/totalCredits).isNaN ?0:(totalGpa/totalCredits) , totalCredits]);
+      tempList.add([
+        (totalGpa / totalCredits).isNaN ? 0 : (totalGpa / totalCredits),
+        totalCredits
+      ]);
     }
     gpaCreditValueList.add(tempList);
     return true;
   }
 
   // Adding widgets to widget List
-  void addNewWidget(int year) async{
+  void addNewWidget(int year) async {
     bool state = await calculateYearGpa(year);
     setState(() {
       yearWidgetList.add(Container(
@@ -120,8 +118,7 @@ class _Degree01State extends State<Degree01> {
               color: const Color(0xFF6F61C0),
               width: 5,
             ),
-            borderRadius: const BorderRadius.all(Radius.circular(10))
-        ),
+            borderRadius: const BorderRadius.all(Radius.circular(10))),
         child: Column(
           children: [
             Row(
@@ -132,19 +129,29 @@ class _Degree01State extends State<Degree01> {
                   padding: const EdgeInsets.all(10),
                   margin: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    // color: const Color(0xFFD9D9D9),
+                      // color: const Color(0xFFD9D9D9),
                       border: Border.all(
                         color: Colors.activeColor,
-                          width: 3,
+                        width: 3,
                       ),
-                      borderRadius: const BorderRadius.all(Radius.circular(14))
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(14))),
+                  child: Text(
+                    "Year: $year",
+                    style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.activeColor),
                   ),
-                  child: Text("Year: $year", style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.activeColor),),
                 ),
 
                 // GPA and credit amount
-                Text("GPA: ${((gpaCreditValueList [year-1][0][0]*gpaCreditValueList[year-1][0][1]+gpaCreditValueList[year-1][1][0]*gpaCreditValueList[year-1][1][1])/(gpaCreditValueList[year-1][0][1]+gpaCreditValueList[year-1][1][1])).toStringAsFixed(2)} "
-                    "\nTotal Credits: ${(gpaCreditValueList[year-1][0][1]+gpaCreditValueList[year-1][1][1]).toStringAsFixed(0)}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),),
+                Text(
+                  "GPA: ${((gpaCreditValueList[year - 1][0][0] * gpaCreditValueList[year - 1][0][1] + gpaCreditValueList[year - 1][1][0] * gpaCreditValueList[year - 1][1][1]) / (gpaCreditValueList[year - 1][0][1] + gpaCreditValueList[year - 1][1][1])).toStringAsFixed(2)} "
+                  "\nTotal Credits: ${(gpaCreditValueList[year - 1][0][1] + gpaCreditValueList[year - 1][1][1]).toStringAsFixed(0)}",
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 14),
+                ),
 
                 // Close cross button
                 // const Icon(Icons.close, color: Colors.red,)
@@ -173,8 +180,9 @@ class _Degree01State extends State<Degree01> {
                     onTap: () {
                       // semesterClick(yearNo, index+1);
                       // print("$year $index");
-                      Navigator.of(context).push(MaterialPageRoute(builder: (_){
-                        return Results(year, index+1, degreeName);
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (_) {
+                        return Results(year, index + 1, degreeName);
                       }));
                     },
                     child: Container(
@@ -182,31 +190,37 @@ class _Degree01State extends State<Degree01> {
                       margin: const EdgeInsets.all(3),
                       decoration: BoxDecoration(
                           border: Border.all(
-                              width: 1,
-                              color: const Color(0xFF707070)
-                          ),
+                              width: 1, color: const Color(0xFF707070)),
                           borderRadius: BorderRadius.circular(20),
-                          color: Colors.mainColor
-                      ),
+                          color: Colors.mainColor),
 
                       // color: Colors.mainColor,
                       // width: double.infinity,
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment
-                            .spaceAround,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Text("Semester ${index + 1}", style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold),),
-                          Text("GPA: ${gpaCreditValueList[year-1][index][0].toStringAsFixed(2)}", style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold),),
-                          Text(gpaCreditValueList[year-1][index][1].toStringAsFixed(0), style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold),)
+                          Text(
+                            "Semester ${index + 1}",
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            "GPA: ${gpaCreditValueList[year - 1][index][0].toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            gpaCreditValueList[year - 1][index][1]
+                                .toStringAsFixed(0),
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold),
+                          )
                         ],
                       ),
                     ),
@@ -214,17 +228,17 @@ class _Degree01State extends State<Degree01> {
                 })
           ],
         ),
-
       ));
     });
   }
+
   String degreeName = "Unknown";
   Future<void> getSharedPreferences() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
-      try{
+      try {
         degreeName = preferences.getString("degree_name")!;
-      }catch(e){
+      } catch (e) {
         print('$e');
       }
     });
@@ -233,50 +247,58 @@ class _Degree01State extends State<Degree01> {
   @override
   Widget build(BuildContext context) {
     late String classType;
-    if(gpaCalculated >= 3.7) {
+    if (gpaCalculated >= 3.7) {
       classType = "1st Class";
-    } else if (gpaCalculated >= 3.3){
+    } else if (gpaCalculated >= 3.3) {
       classType = "2nd Upper";
-    } else if(gpaCalculated >= 3) {
+    } else if (gpaCalculated >= 3) {
       classType = "2nd Lower";
-    }else {
+    } else {
       classType = "Ordinary";
     }
     return Scaffold(
-      appBar: AppBar(
-        title: Text(degreeName),
-        // leading: const Icon(Icons.menu, weight: 10,),
-      ),
-      body: Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
+        appBar: AppBar(
+          title: Text(degreeName),
+          // leading: const Icon(Icons.menu, weight: 10,),
+        ),
+        body: Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
             children: [
               Container(
                 margin: const EdgeInsets.all(10),
                 width: double.infinity,
                 height: 120,
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.activeColor,
-                    width: 4,
-                  ),
-                  borderRadius: const BorderRadius.all(Radius.circular(25))
-                ),
+                    border: Border.all(
+                      color: Colors.activeColor,
+                      width: 4,
+                    ),
+                    borderRadius: const BorderRadius.all(Radius.circular(25))),
                 child: Center(
                   // Main Score display ...
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Text(classType, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF9F9F9F))),
-
-                      Text(gpaCalculated.toStringAsFixed(3), style: const TextStyle(fontSize: 35, fontWeight: FontWeight.bold),),
-
-                      const Text("Total GPA", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF9F9F9F))),
+                      Text(classType,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Color(0xFF9F9F9F))),
+                      Text(
+                        gpaCalculated.toStringAsFixed(3),
+                        style: const TextStyle(
+                            fontSize: 35, fontWeight: FontWeight.bold),
+                      ),
+                      const Text("Total GPA",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Color(0xFF9F9F9F))),
                     ],
                   ),
                 ),
               ),
-
               Expanded(
                 child: ListView(
                   shrinkWrap: true,
@@ -288,84 +310,99 @@ class _Degree01State extends State<Degree01> {
                 ),
               )
             ],
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
+        floatingActionButton: FloatingActionButton(
           onPressed: () {
             addNewWidget(++yearNo);
           },
-        backgroundColor: Colors.activeColor,
-        child: const Icon(Icons.add),
-      ),
-      drawer: Drawer(
-        elevation: 200,
-        backgroundColor: const Color(0xFF3C4B55),
-        child:Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            margin: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-                border: Border.all(color: Colors.white, width: 3)
-            ),
-            child: ListTile(
-              leading: const Icon(Icons.person, color: Colors.white,),
-              title: const Text("My Profile", style: TextStyle(fontSize: 20, color: Colors.white),),
-              onTap: () {
-                Navigator.of(context).pushNamed("user_profile");
-              },
-            ),
+          backgroundColor: Colors.activeColor,
+          foregroundColor: Colors.white,
+          child: const Icon(Icons.add),
+        ),
+        drawer: Drawer(
+          elevation: 200,
+          backgroundColor: const Color(0xFF3C4B55),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                margin: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white, width: 3)),
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.person,
+                    color: Colors.white,
+                  ),
+                  title: const Text(
+                    "My Profile",
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pushNamed("user_profile");
+                  },
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white, width: 3)),
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.person,
+                    color: Colors.white,
+                  ),
+                  title: const Text(
+                    "GPA Scale",
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pushNamed('scale');
+                  },
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white, width: 3)),
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.book,
+                    color: Colors.white,
+                  ),
+                  title: const Text(
+                    "About",
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pushNamed("about");
+                  },
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white, width: 3)),
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.logout_sharp,
+                    color: Colors.white,
+                  ),
+                  title: const Text(
+                    "Logout",
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                  ),
+                  onTap: () {
+                    systemLogout();
+                    print("System Logout");
+                  },
+                ),
+              ),
+            ],
           ),
-
-          Container(
-            margin: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-                border: Border.all(color: Colors.white, width: 3)
-            ),
-            child: ListTile(
-              leading: const Icon(Icons.person, color: Colors.white,),
-              title: const Text("GPA Scale", style: TextStyle(fontSize: 20, color: Colors.white),),
-              onTap: () {
-                Navigator.of(context).pushNamed('scale');
-              },
-            ),
-          ),
-
-          Container(
-            margin: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-                border: Border.all(color: Colors.white, width: 3)
-            ),
-            child: ListTile(
-              leading: const Icon(Icons.book, color: Colors.white,),
-              title: const Text("About", style: TextStyle(fontSize: 20, color: Colors.white),),
-              onTap: () {
-                print("Some click");
-                Navigator.of(context).pushNamed("about");
-              },
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-                border: Border.all(color: Colors.white, width: 3)
-            ),
-            child: ListTile(
-              leading: const Icon(Icons.logout_sharp, color: Colors.white,),
-              title: const Text("Logout", style: TextStyle(fontSize: 20, color: Colors.white),),
-              onTap: () {
-                systemLogout();
-                print("System Logout");
-              },
-            ),
-          ),
-
-
-      ],
-    ),
-    )
-    );
+        ));
   }
 
   Future<void> systemLogout() async {
@@ -377,5 +414,4 @@ class _Degree01State extends State<Degree01> {
     await SQLHelper.deleteDatabase();
     Navigator.of(context).pushNamed("loginPage");
   }
-
 }
