@@ -23,7 +23,7 @@ class About extends StatelessWidget {
                 width: 120,
               )),
               const Text(
-                "Version : 2.5.0",
+                "Version : 3.0.0",
                 style: TextStyle(
                     fontSize: 15,
                     fontStyle: FontStyle.italic,
@@ -44,7 +44,7 @@ class About extends StatelessWidget {
               const Padding(
                 padding: EdgeInsets.all(5),
                 child: Text(
-                    """Our GPA Calculator app, version 2.5.0 is developed to support students' academic journeys. Our aim is to simplify the often-complex task of GPA calculation and management. We understand students' challenges in tracking their grades and staying on top of their academic progress. With our app, we provide a user-friendly solution that allows students to calculate and keep track of their GPA effortlessly. GPA Calculator is here to make your educational experience smoother and more organized. 
+                    """Our GPA Calculator app, version 4.0.0 is developed to support students' academic journeys. Our aim is to simplify the often-complex task of GPA calculation and management. We understand students' challenges in tracking their grades and staying on top of their academic progress. With our app, we provide a user-friendly solution that allows students to calculate and keep track of their GPA effortlessly. GPA Calculator is here to make your educational experience smoother and more organized. 
 This application allows users to calculate semester GPA by adding course modules to each semester separately also you can save your data in the cloud. 
 Your final GPA is based on course credits and grades achieved.
 Thank you for choosing GPA Calculator, and we hope it proves to be a helpful tool in your academic journey.
