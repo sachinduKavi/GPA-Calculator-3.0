@@ -15,12 +15,15 @@ class CreateAccount extends StatefulWidget {
 }
 
 class _CreateAccountState extends State<CreateAccount> {
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   // ignore: prefer_final_fields
-  late String _name, _email, _password, _password02, _university, _degree, _mobile;
-
-
+  late String _name,
+      _email,
+      _password,
+      _password02,
+      _university,
+      _degree,
+      _mobile;
 
 // Widget formText method that returns a widget
   Widget formName(String hintText) {
@@ -38,9 +41,7 @@ class _CreateAccountState extends State<CreateAccount> {
         _name = text!;
       },
       decoration: InputDecoration(
-          hintText: hintText,
-          labelText: "Enter your $hintText"
-      ),
+          hintText: hintText, labelText: "Enter your $hintText"),
     );
   }
 
@@ -58,9 +59,7 @@ class _CreateAccountState extends State<CreateAccount> {
         _email = text!;
       },
       decoration: InputDecoration(
-          hintText: hintText,
-          labelText: "Enter your $hintText"
-      ),
+          hintText: hintText, labelText: "Enter your $hintText"),
     );
   }
 
@@ -80,9 +79,7 @@ class _CreateAccountState extends State<CreateAccount> {
         _mobile = text!;
       },
       decoration: InputDecoration(
-          hintText: hintText,
-          labelText: "Enter your $hintText"
-      ),
+          hintText: hintText, labelText: "Enter your $hintText"),
     );
   }
 
@@ -101,9 +98,7 @@ class _CreateAccountState extends State<CreateAccount> {
         _university = text!;
       },
       decoration: InputDecoration(
-          hintText: hintText,
-          labelText: "Enter your $hintText"
-      ),
+          hintText: hintText, labelText: "Enter your $hintText"),
     );
   }
 
@@ -122,9 +117,7 @@ class _CreateAccountState extends State<CreateAccount> {
         _degree = text!;
       },
       decoration: InputDecoration(
-          hintText: hintText,
-          labelText: "Enter your $hintText"
-      ),
+          hintText: hintText, labelText: "Enter your $hintText"),
     );
   }
 
@@ -143,9 +136,7 @@ class _CreateAccountState extends State<CreateAccount> {
         _password = text!;
       },
       decoration: InputDecoration(
-          hintText: hintText,
-          labelText: "Enter your $hintText"
-      ),
+          hintText: hintText, labelText: "Enter your $hintText"),
     );
   }
 
@@ -164,9 +155,7 @@ class _CreateAccountState extends State<CreateAccount> {
         _password02 = text!;
       },
       decoration: InputDecoration(
-          hintText: hintText,
-          labelText: "Enter your $hintText"
-      ),
+          hintText: hintText, labelText: "Enter your $hintText"),
     );
   }
 
@@ -174,7 +163,10 @@ class _CreateAccountState extends State<CreateAccount> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text("CREATE NEW ACCOUNT", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),)),
+          title: const Text(
+        "CREATE NEW ACCOUNT",
+        style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+      )),
       body: SingleChildScrollView(
         child: Container(
           margin: const EdgeInsets.all(20),
@@ -216,18 +208,20 @@ class _CreateAccountState extends State<CreateAccount> {
                     width: double.infinity,
                     child: ElevatedButton(
                         onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        print("Valid Form");
-                        _formKey.currentState!.save();
-                        postData();
-                      } else {
-                        print("Invalid Form");
-                      }
-
-                    },
+                          if (_formKey.currentState!.validate()) {
+                            print("Valid Form");
+                            _formKey.currentState!.save();
+                            postData();
+                          } else {
+                            print("Invalid Form");
+                          }
+                        },
                         child: const Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Text("SIGN UP", style: TextStyle(fontSize: 25),))),
+                            padding: EdgeInsets.all(10),
+                            child: Text(
+                              "SIGN UP",
+                              style: TextStyle(fontSize: 25),
+                            ))),
                   ),
                 )
               ],
@@ -241,48 +235,79 @@ class _CreateAccountState extends State<CreateAccount> {
   Future postData() async {
     // Waiting circle
     if (_password == _password02) {
-      showDialog(context: context,
+      showDialog(
+          context: context,
           barrierDismissible: false,
           builder: (context) {
-        return const Center(child: CircularProgressIndicator(color: Colors.white,),);
-      });
+            return const Center(
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
+            );
+          });
       // Posting values in the sever to store in the database
       try {
-        var response = await http.post(Uri.parse('${Domain.mainDomain}/users/addUserDetails'),
-        body: {"userName": _name.trim(), "email": _email.trim().toLowerCase(), "password": _password.trim(), "university": _university.trim(), "degree": _degree.trim(), "mobile": _mobile.trim()}
-        );
-        if(response.statusCode == 201) {
+        var response = await http
+            .post(Uri.parse('${Domain.mainDomain}users/addUserDetails'), body: {
+          "userName": _name.trim(),
+          "email": _email.trim().toLowerCase(),
+          "password": _password.trim(),
+          "university": _university.trim(),
+          "degree": _degree.trim(),
+          "mobile": _mobile.trim()
+        });
+        print(response);
+        if (response.statusCode == 201) {
           print(response.body);
         } else {
-          print ("Error Occur");
+          print("Error Occur");
         }
         Navigator.of(context).pop();
         Navigator.of(context).pushNamed("loginPage");
       } catch (exception) {
         print(exception);
-        showDialog(context: context,
+        showDialog(
+            context: context,
             barrierDismissible: false,
-            builder: (BuildContext context){
-          return AlertDialog(
-            icon: Icon(Icons.wifi_tethering_error_sharp, color: Colors.red, size: 45,),
-            title: Text("Sorry, can't connect to the server, please check your internet connection and try again.", style: TextStyle(fontSize: 22, color: Colors.red),),
-            content: Container(
-              child: ElevatedButton(onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pushNamed("loginPage");
-              }, child: Text("Ok")),
-            ),
-          );
-        });
+            builder: (BuildContext context) {
+              return AlertDialog(
+                icon: const Icon(
+                  Icons.wifi_tethering_error_sharp,
+                  color: Colors.red,
+                  size: 45,
+                ),
+                title: const Text(
+                  "Sorry, can't connect to the server, please check your internet connection and try again.",
+                  style: TextStyle(fontSize: 22, color: Colors.red),
+                ),
+                content: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pushNamed("loginPage");
+                    },
+                    child: Text("Ok")),
+              );
+            });
       }
     } else {
-      showDialog(context: context, builder: (BuildContext context) {
-        return const AlertDialog(
-          icon: Icon(Icons.error_outline, color: Colors.red, size: 50,),
-          title: Text("Password Mismatched", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.red),),
-        );
-      });
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return const AlertDialog(
+              icon: Icon(
+                Icons.error_outline,
+                color: Colors.red,
+                size: 50,
+              ),
+              title: Text(
+                "Password Mismatched",
+                style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red),
+              ),
+            );
+          });
     }
-
   }
 }
